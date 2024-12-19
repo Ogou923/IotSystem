@@ -5,7 +5,6 @@ import struct
 import numpy as np
 front_data_list = [] #縦に積んでく
 back_data_list = []
-a=1
 
 def start_server():
     host = ''
