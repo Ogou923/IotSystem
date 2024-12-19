@@ -6,6 +6,7 @@ import numpy as np
 front_data_list = [] #縦に積んでく
 back_data_list = []
 
+# サーバを動かす関数
 def start_server():
     host = ''
     port = 8002
@@ -21,7 +22,7 @@ def start_server():
         client_thread = threading.Thread(target=handle_client, args=(conn, addr))
         client_thread.start()
 
-
+# つながったら動く関数
 def handle_client(conn, addr):
     with conn:
         message = "who,"
@@ -65,11 +66,13 @@ def handle_client(conn, addr):
             print("誰か知らん奴接続した")
             conn.close()
 
+# メッセージの送信
 def sending(message, conn):
     if message == "":
         message = "quit,1"
     conn.sendall((message + "\n").encode('utf-8'))
 
+# データの受信
 def receiving(conn):
     data = conn.recv(1024)
     try:
@@ -86,7 +89,8 @@ def receiving(conn):
     except UnicodeDecodeError:
         data = "デコードエラー"
         return data
-    
+
+# データを受け取り続ける関数    
 def transceiver(conn, addr, micnum):
     i = 0
     while True:
