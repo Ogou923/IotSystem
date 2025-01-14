@@ -76,11 +76,13 @@ def sending(message, conn):
 def receiving(conn):
     data = conn.recv(1024)
     try:
-        if len(data) == struct.calcsize('3d'):
-            sendtime = struct.unpack('3d', data)
-            second = int(sendtime[1])
-            milli = int(sendtime[2])
-            hzdata = np.array([sendtime[0], float(str(second) + "." + str(milli))])
+        if len(data) == struct.calcsize('4d'):
+            receive_data = struct.unpack('4d', data)
+            hz = kirisute(receive_data[0])
+            amplitude = kirisute(receive_data[1])#ここから
+            second = int(receive_data[2])
+            milli = int(receive_data[3])
+            hzdata = np.array([receive_data[0], receive_data[1], float(str(second) + "." + str(milli))])
             return hzdata
         else:
             data = data.split(b'\n')[0]
@@ -89,6 +91,10 @@ def receiving(conn):
     except UnicodeDecodeError:
         data = "デコードエラー"
         return data
+
+#小数点第2位切り捨て関数
+def kirisute(value):
+    return int(value * 100) / 100
 
 # データを受け取り続ける関数    
 def transceiver(conn, addr, micnum):
@@ -105,10 +111,10 @@ def transceiver(conn, addr, micnum):
                 print(data)
                 break
         if micnum == 0:
-            print(f"receiving success:{data[0]}-{data[1]}")
+            print(f"receiving success:{data[0]}-{data[1]}-{data[2]}")
             front_data_list.append([data[0], data[1]]) #データ格納
         else:
-            print(f"receiving success:{data[0]}-{data[1]}")
+            print(f"receiving success:{data[0]}-{data[1]}-{data[2]}")
             back_data_list.append([data[0], data[1]]) #データ格納
 
         difference = front_data_list[-1][1] - front_data_list[0][1]
@@ -116,8 +122,7 @@ def transceiver(conn, addr, micnum):
             print("2秒以上取れた")
             result = sound_identification()
             if result == 1:
-                print("サイレン検知")
-                i = 1 #Androidにメッセージ送信
+                a = 1 #Androidにメッセージ送信
         message = "action"
         sending(message, conn)
         print("sending success")
