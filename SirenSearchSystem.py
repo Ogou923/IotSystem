@@ -116,6 +116,7 @@ def transceiver(conn, addr, micnum):
             print("2秒以上取れた")
             result = sound_identification()
             if result == 1:
+                print("サイレン検知")
                 i = 1 #Androidにメッセージ送信
         message = "action"
         sending(message, conn)
